@@ -1,0 +1,1 @@
+{"id":"cherry","name":"CherryPkg","deps":{"json":"https://github.com/rebolek/red-tools/blob/master/codecs/json.red"}}
