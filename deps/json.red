@@ -1,4 +1,4 @@
-;cherrypkg - https://raw.githubusercontent.com/rebolek/red-tools/master/codecs/json.red - 28-Oct-2019/23:16:40
+;cherrypkg - https://raw.githubusercontent.com/rebolek/red-tools/master/codecs/json.red - 29-Oct-2019/0:36:39
 
 Red [
     Title: "JSON parser"

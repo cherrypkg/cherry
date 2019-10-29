@@ -1,41 +1,52 @@
 Red [
 
 	Title: "Cherry Package Manager"
+	Needs: 'View
 
 ]
 
 #include %../deps/json.red
-
+#if config [
+	
+	#include %../deps/input.red
+	
+]
 #include %../lib/libcherry.red
+; #include %environment/console/CLI/input.red
 
 args: split system/script/args " "
 
-load-json: :json/decode
-to-json: :json/encode
-
 switch args/1 [
 
-	; "init" [
+	"init" [
 
-	; 	id: ask rejoin ["id (" replace last split-path cherry/utils/cwd "/" "" "): "]
-	; 	if (length? id) = 0 [id: replace last split-path cherry/utils/cwd "/" ""]
+		id: ask rejoin ["id (" replace last split-path cherry/utils/get-cwd "/" "" "): "]
+		if (length? id) = 0 [id: replace last split-path cherry/utils/get-cwd "/" ""]
 	
-	; 	name: ask rejoin ["name (" id "): "]
-	; 	if (length? name) = 0 [name: id]
+		name: ask rejoin ["name (" id "): "]
+		if (length? name) = 0 [name: id]
 
-	; ]
+	]
 
 	"install" [
 		
-		json: load-json read cherry/utils/get-cherry-location cherry/utils/get-cwd
+		either error? cherry/utils/get-cherry-location cherry/utils/get-cwd [
 
-		foreach name keys-of json/deps [
+			print "Error: cherry.json not found."
 
-			location: json/deps/(name)
-			name: pick split to-string last split-path to-url location "." 1
+		] [
 
-			cherry/add-dep name location
-			cherry/install-dep name location
+			data: json/decode read cherry/utils/get-cherry-location cherry/utils/get-cwd
+
+			foreach name keys-of data/deps [
+
+				location: data/deps/(name)
+				name: pick split to-string last split-path to-url location "." 1
+
+				cherry/add-dep name location
+				cherry/install-dep name location
+
+			]
 
 		]
 
@@ -43,20 +54,36 @@ switch args/1 [
 
 	"add" [
 
-		location: args/2
-		name: pick split to-string last split-path to-url location "." 1
+		either error? cherry/utils/get-cherry-location cherry/utils/get-cwd [
 
-		cherry/add-dep name location
-		cherry/install-dep name location
+			print "Error: cherry.json not found."
 
-		print rejoin ["Installed `" location "` as '" name "' successfully!"]
+		] [
+
+			location: args/2
+			name: pick split to-string last split-path to-url location "." 1
+
+			cherry/add-dep name location
+			cherry/install-dep name location
+
+			print rejoin ["Installed `" location "` as '" name "' successfully!"]
+
+		]
 
 	]
 
 	"remove" [
 
-		cherry/remove-dep args/2
-		cherry/uninstall-dep args/2
+		either error? cherry/utils/get-cherry-location cherry/utils/get-cwd [
+
+			print "Error: cherry.json not found."
+
+		] [
+
+			cherry/remove-dep args/2
+			cherry/uninstall-dep args/2
+
+		]
 
 	]
 

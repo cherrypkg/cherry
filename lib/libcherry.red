@@ -96,12 +96,12 @@ cherry: context [
 			] [
 
 				mp: m
-				parse data [thru "#include" thru "%" copy m thru ".red"]
+				parse data [thru "#include" thru "%" copy m thru [".reds" | ".red"]]
 
 				if (length? m) <> 0 [
 					
-					replace data ["#include" thru "%" thru ".red"] (cherry/utils/get-dep to-url rejoin [rejoin reverse remove reverse split-path location m] false)
-					
+					replace data ["#include" thru "%" thru [".reds" | ".red"]] (cherry/utils/get-dep to-url rejoin [rejoin reverse remove reverse split-path location m] false)
+
 				]
 
 			]
@@ -117,25 +117,27 @@ cherry: context [
 		name [string!]
 		location [string! url!]
 		/local
-			json
+			data
 
 	] [
 
-		json: load-json read cherry/utils/get-cherry-location cherry/utils/get-cwd
-		json/deps/(to-word name): location
-		write cherry/utils/get-cherry-location cherry/utils/get-cwd to-json json
+		data: json/decode read cherry/utils/get-cherry-location cherry/utils/get-cwd
+		data/deps/(to-word name): location
+		write cherry/utils/get-cherry-location cherry/utils/get-cwd json/encode data
 
 	]
 
 	remove-dep: func [
 
 		name [string!]
+		/local
+			data
 
 	] [
 
-		json: load-json read cherry/utils/get-cherry-location cherry/utils/get-cwd
-		remove/key json/deps (to-word name)
-		write cherry/utils/get-cherry-location cherry/utils/get-cwd to-json json
+		data: json/decode read cherry/utils/get-cherry-location cherry/utils/get-cwd
+		remove/key data/deps (to-word name)
+		write cherry/utils/get-cherry-location cherry/utils/get-cwd json/encode data
 
 	]
 
